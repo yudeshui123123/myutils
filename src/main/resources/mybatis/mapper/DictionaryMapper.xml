@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.common.myutils.mapper.DictionaryMapper">
+
+
+    <resultMap id="dictionaryList" type="Dictionary">
+        <id property="id" column="id"></id>
+        <result property="pId" column="p_id"></result>
+        <result property="dataTypeCode" column="data_type_code"></result>
+        <result property="dataType" column="data_type"></result>
+        <result property="dataValue" column="data_value"></result>
+        <result property="dataText" column="data_text"></result>
+        <result property="sortNum" column="sort_num"></result>
+        <result property="status" column="status"></result>
+        <result property="dataDescribe" column="data_describe"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="modifyTime" column="modify_time"></result>
+        <collection property="dictionaryList" select="queryByDictionaryAll" column="{pId=id,status=status}" ofType="Dictionary"></collection>
+    </resultMap>
+    <sql id="queryDictionary">
+        id,p_id,data_type_code,data_type,data_value,data_text,sort_num,status,data_describe,create_time,modify_time
+    </sql>
+
+    <!--查询字典列表  递归-->
+    <select id="queryByDictionaryAll" parameterType="Dictionary" resultMap="dictionaryList">
+        select
+        <include refid="queryDictionary"></include>
+        from
+        my_common_dictionary
+        <where>
+            <if test="id!= null and id != ''">
+                id = #{id}
+            </if>
+            <if test="pId != null and pId != ''">
+                p_id = #{pId}
+            </if>
+            <if test="dataTypeCode != null and dataTypeCode != ''">
+                and data_type_code = #{dataTypeCode}
+            </if>
+            <if test="dataType != null and dataType != ''">
+                and data_type = #{dataType}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+        order by sort_num
+    </select>
+
+    <!--根据id 递归-->
+    <select id="queryDictionaryById" parameterType="String" resultMap="dictionaryList">
+        select
+        <include refid="queryDictionary"></include>
+        from
+        my_common_dictionary
+        <where>
+            id = #{id}
+            and
+            status = 0
+        </where>
+        order by sort_num
+    </select>
+
+    <!--查询大于等于sortNum的数据-->
+    <select id="queryGreaterOrEqualToByPId" resultType="java.lang.String">
+        select id from my_common_dictionary where p_id = #{pId}
+         and sort_num >= #{sortNum}
+         and status = 0
+    </select>
+
+    <!--查询在smallSortNum-bigSortNum之间的sortNum数据-->
+    <select id="queryIntervalByPId" resultType="java.lang.String">
+        select id from my_common_dictionary where p_id = #{pId}
+         and sort_num BETWEEN #{smallSortNum} and #{bigSortNum}
+         and status = 0
+    </select>
+
+    <!--根据pid查询数量-->
+    <select id="queryMaxByPId" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select max(sort_num) from my_common_dictionary where p_id = #{pId} and status = 0
+    </select>
+
+    <!--新增字典数据-->
+    <insert id="insertByDictionary">
+
+        <selectKey keyProperty="sortNum" order="BEFORE" resultType="java.lang.Integer">
+            <choose>
+                <when test="sortNum == null">
+                    SELECT max(sort_num) + 1 FROM my_common_dictionary
+                    <where>
+                        p_id = #{pId}
+                    </where>
+                </when>
+                <otherwise>select #{sortNum} from dual</otherwise>
+            </choose>
+        </selectKey>
+
+        insert into
+        my_common_dictionary
+        (id,p_id,data_type_code,data_type,data_value,data_text,sort_num,status,data_describe)
+        values
+        (#{id},#{pId},#{dataTypeCode},#{dataType},#{dataValue},#{dataText},
+        <choose>
+            <when test="sortNum == null">1</when>
+            <otherwise>#{sortNum}</otherwise>
+        </choose>,
+        <choose>
+            <when test="status == null or status == ''">0</when>
+            <otherwise>#{status}</otherwise>
+        </choose>,
+        #{dataDescribe,jdbcType=VARCHAR})
+    </insert>
+
+    <!--修改字典数据-->
+    <update id="updateByDictionary">
+        update my_common_dictionary
+        <set>
+            <if test="pId != null and pId != ''">
+                p_id = #{pId},
+            </if>
+
+            <if test="dataTypeCode != null and dataTypeCode != ''">
+                data_type_code = #{dataTypeCode},
+            </if>
+
+            <if test="dataValue != null and dataValue != ''">
+                data_value = #{dataValue},
+            </if>
+
+            <if test="dataType != null and dataType != ''">
+                data_type = #{dataType},
+            </if>
+
+            <if test="dataText != null and dataText != ''">
+                data_text = #{dataText},
+            </if>
+
+            <if test="sortNum != null and sortNum != ''">
+                sort_num = #{sortNum},
+            </if>
+
+            <if test="status != null and status != ''">
+                status = #{status}
+            </if>
+
+            <if test="dataDescribe != null and dataDescribe != ''">
+                data_describe = #{dataDescribe}
+            </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <update id="updateByDictionaryByIds">
+        update my_common_dictionary
+        <set>
+            <if test="type == 0">
+                sort_num = (sort_num-1)
+            </if>
+            <if test="type == 1">
+                sort_num = (sort_num+1)
+            </if>
+        </set>
+        where
+        id in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--删除字典数据-->
+    <delete id="delByDictionaryId">
+        delete from my_common_dictionary where id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>公共页面抽取</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}"  href="/static/layui/css/layui.css" media="all">
+    <style>
+        .layui-nav-item{
+            vertical-align: middle
+        }
+        .layui-nav-item i{
+            vertical-align: middle;
+            margin-top: -1px;
+            margin-right: 5px;
+        }
+        .layui-logo{
+            background-color: #20222A !important;
+            color: rgba(255,255,255,.8);
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,.15);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1002;
+            width: 200px;
+            height: 49px;
+            padding: 0 15px;
+            box-sizing: border-box;
+            overflow: hidden;
+            font-weight: 300;
+            background-repeat: no-repeat;
+            background-position: center center;
+            line-height: 50px;
+            font-size: 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .layui-nav-side{
+            top:49px;
+        }
+    </style>
+</head>
+<body>
+<!--<ul class="layui-nav layui-nav-tree" lay-filter="test">-->
+<div class="layui-logo">
+    <span>myDream</span>
+</div>
+<ul class="layui-nav layui-nav-tree layui-nav-side myNav" lay-filter="demo">
+    <li class="layui-nav-item layui-nav-itemed">
+        <a href="javascript:;"><i class="layui-icon layui-icon-cols"></i><cite>数据管理</cite></a>
+        <dl class="layui-nav-child">
+            <dd><a href="javascript:;">字典管理</a></dd>
+            <dd><a href="javascript:;">选项2</a></dd>
+            <dd><a href="">跳转</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item">
+        <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i><cite>解决方案</cite></a>
+        <dl class="layui-nav-child">
+            <dd><a href="">移动模块</a></dd>
+            <dd><a href="">后台模版</a></dd>
+            <dd><a href="">电商平台</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item"><a href="">产品</a></li>
+    <li class="layui-nav-item"><a href="">大数据</a></li>
+</ul>
+<script th:src="@{/static/layui/layui.js}"></script>
+<script>
+    layui.use(['element','layer'], function(){
+        let layer = layui.layer;
+        let element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+        let $ = layui.$;
+        //监听导航点击
+        element.on('nav(demo)', function(elem){
+            /*console.log(elem);
+            layer.msg(elem.text());
+            console.log($.fn.jquery);*/
+        });
+    });
+</script>
+</body>
+</html>

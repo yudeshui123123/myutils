@@ -1,0 +1,42 @@
+server:
+  port: 8888
+  #servlet:
+    #context-path: /myUtils
+  servlet:
+    encoding:
+      charset: utf-8
+spring:
+  thymeleaf:
+    cache: false
+  #配置静态资源访问路径
+  mvc:
+    static-path-pattern: /static/**
+  resources:
+    static-locations: classpath:/static/
+#数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.17.131:3306/mycommon?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    username: "root"
+    password: "123"
+    schema:
+      - classpath:sql/dictionary.sql
+    initialization-mode: always
+#mybatis配置
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mapper/*Mapper.xml
+  type-aliases-package: com.common.myutils.entity
+
+#日志
+logging:
+  level:
+    com.common.myutils: debug
+
+#分页
+pagehelper:
+  helper-dialect: mysql
+  params: count=countSql
+  reasonable: true
+  support-methods-arguments: true
+---
